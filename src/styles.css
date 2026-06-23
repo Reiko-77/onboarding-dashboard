@@ -474,6 +474,7 @@ button {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+  align-items: start;
 }
 
 .sub-grid.compact {
@@ -561,6 +562,7 @@ button {
 
 .review-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -568,7 +570,7 @@ button {
   display: grid;
   grid-template-columns: 26px 1fr;
   gap: 8px;
-  align-items: center;
+  align-items: start;
   padding: 9px;
   border: 1px solid #dce5f2;
   border-radius: 6px;

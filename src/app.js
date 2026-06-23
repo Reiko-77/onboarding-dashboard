@@ -259,7 +259,7 @@ function renderMainFunnel() {
       <div class="stage-title">${stage.title} <small>${stage.titleCn}</small></div>
       <div class="stage-metric">${stage.metric}</div>
       <div class="stage-value">${stage.value}</div>
-      <div class="stage-sub"><span>Share: ${stage.share}</span><span class="tag">${stage.tag}</span></div>
+      <div class="stage-sub"><span>Share:<br>${stage.share}</span></div>
       ${subSteps ? `<div class="stage-sub"><span>${subSteps}</span><span>Mock Data</span></div>` : ""}
     </button>`);
 
@@ -320,8 +320,6 @@ function renderSubBreakdown() {
     <div class="sub-grid compact">
       <article class="sub-card ${state.selectedStage === "submit" ? "active" : ""}" data-sub-stage="submit">
         <h3 class="sub-title">Submit / 提资 <span class="tag">${submitSteps.length} sub steps</span></h3>
-        <div class="metric-row"><span>T14 提资卖家数</span><strong>xx</strong></div>
-        <div class="metric-row"><span>注册 → 提资转化率</span><strong>xx%</strong></div>
         <div class="stepper">
           ${submitSteps
             .map((step, index) => `<div class="step" data-step="${index + 1}">
@@ -333,7 +331,6 @@ function renderSubBreakdown() {
       </article>
       <article class="sub-card ${state.selectedStage === "moderate" ? "active" : ""}" data-sub-stage="moderate">
         <h3 class="sub-title">Moderate / 审核 <span class="tag">4 review checks</span></h3>
-        <div class="metric-row"><span>提资 → 审核转化率</span><strong>xx%</strong></div>
         <div class="review-grid">
           ${dashboardData.moderateSubSteps
             .map(([name, nameCn, key, value]) => `<div class="review-item" title="${metricTooltip(key, name)}">
