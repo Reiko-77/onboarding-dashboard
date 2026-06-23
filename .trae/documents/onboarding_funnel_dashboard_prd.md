@@ -86,7 +86,7 @@ flowchart TD
 | Registered Seller | `registered_seller_t14` | `xx` |
 | Submit Sellers T14 | `submit_sellers_t14` | `xx` |
 | One Time Pass Seller T14 | `one_time_pass_seller_t14` | `xx` |
-| Onboarded Seller Volume | `onboarded_seller_volume` | `xx` |
+| # Onboarded Seller(w/ UBO passed) T14 | `onboarded_seller_w_ubo_passed_t14` | `xx` |
 | Registration → Onboarding | `registration_to_onboarding_rate_t14` | `xx%` |
 | Submit → Onboarding | `submit_to_onboarding_rate_t14` | `xx%` |
 

@@ -33,14 +33,6 @@ const filterFields = [
 ];
 
 const dashboardData = {
-  kpis: [
-    ["Registered Seller", "registered_seller_t14", "xx", "T14"],
-    ["Submit Sellers T14", "submit_sellers_t14", "xx", "T14"],
-    ["One Time Pass Seller T14", "one_time_pass_seller_t14", "xx", "T14"],
-    ["Onboarded Seller Volume", "onboarded_seller_volume", "xx", "T14"],
-    ["Registration → Onboarding", "registration_to_onboarding_rate_t14", "xx%", "T14"],
-    ["Submit → Onboarding", "submit_to_onboarding_rate_t14", "xx%", "T14"],
-  ],
   funnel: [
     {
       key: "register",
@@ -79,12 +71,12 @@ const dashboardData = {
       key: "onboard",
       title: "Onboard",
       titleCn: "入驻",
-      metric: "Onboarded Seller Volume",
-      metricKey: "onboarded_seller_volume",
+      metric: "# Onboarded Seller(w/ UBO passed) T14",
+      metricKey: "onboarded_seller_w_ubo_passed_t14",
       value: "xx",
       share: "xx%",
       tag: "Success",
-      summary: "Final onboarding success volume",
+      summary: "Final onboarded seller volume with UBO passed",
     },
   ],
   arrows: [
@@ -113,7 +105,7 @@ const dashboardData = {
       route: "Register → Onboard",
       metricKey: "registration_to_onboarding_rate_t14",
       value: "xx%",
-      numerator: "onboarded_seller_volume",
+      numerator: "onboarded_seller_w_ubo_passed_t14",
       denominator: "registered_seller_t14",
       stages: ["register", "onboard"],
     },
@@ -121,7 +113,7 @@ const dashboardData = {
       route: "Submit → Onboard",
       metricKey: "submit_to_onboarding_rate_t14",
       value: "xx%",
-      numerator: "onboarded_seller_volume",
+      numerator: "onboarded_seller_w_ubo_passed_t14",
       denominator: "submit_sellers_t14",
       stages: ["submit", "onboard"],
     },
@@ -171,27 +163,6 @@ const dashboardData = {
     ["Human Mod Passed T14", "人工审核通过卖家数", "human_mod_passed_seller_t14", "xx"],
     ["PIPO Passed T14", "PIPO 通过卖家数", "pipo_passed_seller_t14", "xx"],
   ],
-  weeks: ["2026-W24", "2026-W23", "2026-W22", "2026-W21", "2026-W20", "2026-W19"],
-  weeklyMetrics: [
-    ["# Registered Seller", "registered_seller_t14", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["# Submit sellers T14", "submit_sellers_t14", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["submission rate T14", "submission_rate_t14", ["xx%", "xx%", "xx%", "xx%", "xx%", "xx%"]],
-    ["one time pass rate T14", "one_time_pass_rate_t14", ["xx%", "xx%", "xx%", "xx%", "xx%", "xx%"]],
-    ["# one time pass seller T14", "one_time_pass_seller_t14", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["# sellers w/ kyc/kyb passed T14", "kyc_kyb_passed_seller_t14", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["# sellers w/ human mod passed T14", "human_mod_passed_seller_t14", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["# seller w/ pipo passed T14", "pipo_passed_seller_t14", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["Onboarded Seller Volume", "onboarded_seller_volume", ["xx", "xx", "xx", "xx", "xx", "xx"]],
-    ["% Registration->Onboarding -T14", "registration_to_onboarding_rate_t14", ["xx%", "xx%", "xx%", "xx%", "xx%", "xx%"]],
-    ["% submit->onboarding - T14", "submit_to_onboarding_rate_t14", ["xx%", "xx%", "xx%", "xx%", "xx%", "xx%"]],
-  ],
-};
-
-const trendSeries = {
-  submission_rate_t14: { label: "submission_rate_t14", color: "#5f7fae", values: [72, 70, 73, 68, 66, 65] },
-  one_time_pass_rate_t14: { label: "one_time_pass_rate_t14", color: "#d4a72c", values: [55, 57, 54, 53, 51, 52] },
-  registration_to_onboarding_rate_t14: { label: "registration_to_onboarding_rate_t14", color: "#2da44e", values: [42, 41, 43, 39, 38, 37] },
-  submit_to_onboarding_rate_t14: { label: "submit_to_onboarding_rate_t14", color: "#dc7c26", values: [58, 59, 57, 56, 55, 54] },
 };
 
 const state = {
@@ -199,8 +170,6 @@ const state = {
   filtersCollapsed: false,
   selectedStage: "register",
   highlightMetric: null,
-  activeTrendMetric: "submission_rate_t14",
-  hiddenSeries: new Set(),
   loading: false,
 };
 
@@ -228,11 +197,9 @@ function render() {
       ${renderTabs()}
       ${renderTitle()}
       ${renderFilters()}
-      ${renderKpis()}
       ${renderMainFunnel()}
       ${renderConversionBridge()}
       ${renderSubBreakdown()}
-      ${renderAnalytics()}
     </main>
   `;
   bindEvents();
@@ -282,18 +249,6 @@ function renderFilters() {
   </section>`;
 }
 
-function renderKpis() {
-  return `<section class="kpi-grid" aria-label="Core KPI cards">
-    ${dashboardData.kpis
-      .map(([title, key, value, foot]) => `<article class="kpi-card" title="${metricTooltip(key, title)}">
-        <div class="kpi-title">${title}</div>
-        <div class="kpi-value">${value}</div>
-        <div class="kpi-foot">${foot} · WoW --</div>
-      </article>`)
-      .join("")}
-  </section>`;
-}
-
 function renderMainFunnel() {
   const items = [];
   dashboardData.funnel.forEach((stage, index) => {
@@ -329,37 +284,12 @@ function renderMainFunnel() {
       </div>
     </div>
     <div class="funnel-scroll"><div class="funnel">${items.join("")}</div></div>
-    ${renderDetailPanel()}
   </section>`;
 }
 
 function highlightedStages() {
   const conversion = dashboardData.conversions.find((item) => item.metricKey === state.highlightMetric);
   return conversion ? conversion.stages : [];
-}
-
-function renderDetailPanel() {
-  const stage = dashboardData.funnel.find((item) => item.key === state.selectedStage);
-  const related = dashboardData.conversions.filter((item) => item.stages.includes(stage.key));
-  return `<aside class="detail-panel" aria-live="polite">
-    <div>
-      <h3 class="detail-title">${stage.title} / ${stage.titleCn}</h3>
-      <p class="detail-copy">${stage.summary}</p>
-      <div class="metric-row"><span>Main metric</span><strong>${stage.metric}</strong></div>
-      <div class="metric-row"><span>Field</span><strong>${stage.metricKey}</strong></div>
-      <div class="metric-row"><span>Value</span><strong>${stage.value}</strong></div>
-    </div>
-    <div>
-      <h3 class="detail-title">Related Conversion</h3>
-      ${related
-        .map((item) => `<div class="metric-row">
-          <span>${item.route}</span>
-          <strong>${item.metricKey} = ${item.numerator} / ${item.denominator}</strong>
-        </div>`)
-        .join("")}
-      <p class="detail-copy">UBO and Moderate → Onboard conversion are intentionally excluded in this version.</p>
-    </div>
-  </aside>`;
 }
 
 function renderConversionBridge() {
@@ -387,13 +317,7 @@ function renderSubBreakdown() {
       <h2 class="section-title">Sub Step Breakdown</h2>
       <div class="module-meta"><span class="meta-pill">Business Details: ${shouldShowBusinessDetails() ? "shown" : "hidden for personal"}</span></div>
     </div>
-    <div class="sub-grid">
-      <article class="sub-card ${state.selectedStage === "register" ? "active" : ""}" data-sub-stage="register">
-        <h3 class="sub-title">Register / 注册 <span class="tag">Entry</span></h3>
-        <div class="metric-row"><span>注册卖家数</span><strong>xx</strong></div>
-        <div class="metric-row"><span>Field</span><strong>registered_seller_t14</strong></div>
-        <p class="detail-copy">From registration success / seller created. This is the entrance of the onboarding funnel.</p>
-      </article>
+    <div class="sub-grid compact">
       <article class="sub-card ${state.selectedStage === "submit" ? "active" : ""}" data-sub-stage="submit">
         <h3 class="sub-title">Submit / 提资 <span class="tag">${submitSteps.length} sub steps</span></h3>
         <div class="metric-row"><span>T14 提资卖家数</span><strong>xx</strong></div>
@@ -419,110 +343,8 @@ function renderSubBreakdown() {
             .join("")}
         </div>
       </article>
-      <article class="sub-card ${state.selectedStage === "onboard" ? "active" : ""}" data-sub-stage="onboard">
-        <h3 class="sub-title">Onboard / 入驻 <span class="tag">Success</span></h3>
-        <div class="metric-row"><span>入驻卖家量</span><strong>xx</strong></div>
-        <div class="metric-row"><span>注册 → 入驻转化率</span><strong>xx%</strong></div>
-        <div class="metric-row"><span>提资 → 入驻转化率</span><strong>xx%</strong></div>
-        <p class="detail-copy">审核 → 入驻转化率不展示。This card focuses on final onboarding success volume and cross-stage conversion.</p>
-      </article>
     </div>
   </section>`;
-}
-
-function renderAnalytics() {
-  return `<section class="analytics-grid">
-    <article class="module card chart-card">
-      <div class="module-head">
-        <h2 class="section-title">Weekly Trend</h2>
-        <span class="meta-pill">${state.activeTrendMetric}</span>
-      </div>
-      ${renderLegend()}
-      ${renderChart()}
-    </article>
-    <article class="module card table-card">
-      <div class="module-head">
-        <h2 class="section-title">Seller Onboarding Metrics Table</h2>
-        <span class="meta-pill">Sticky first column</span>
-      </div>
-      ${renderMetricsTable()}
-    </article>
-  </section>`;
-}
-
-function renderLegend() {
-  return `<div class="legend">
-    ${Object.entries(trendSeries)
-      .map(([key, series]) => `<button type="button" data-series="${key}" class="${state.hiddenSeries.has(key) ? "" : "active"}">
-        <span class="legend-dot" style="background:${series.color}"></span>${series.label}
-      </button>`)
-      .join("")}
-  </div>`;
-}
-
-function renderChart() {
-  const width = 560;
-  const height = 250;
-  const pad = 34;
-  const points = (values) =>
-    values
-      .map((value, index) => {
-        const x = pad + (index * (width - pad * 2)) / (values.length - 1);
-        const y = height - pad - ((value - 30) / 50) * (height - pad * 2);
-        return `${x},${y}`;
-      })
-      .join(" ");
-
-  const grid = [30, 40, 50, 60, 70, 80]
-    .map((tick) => {
-      const y = height - pad - ((tick - 30) / 50) * (height - pad * 2);
-      return `<line x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}" stroke="#e5e6eb" />
-        <text x="8" y="${y + 4}" font-size="10" fill="#646a73">${tick}%</text>`;
-    })
-    .join("");
-
-  const lines = Object.entries(trendSeries)
-    .filter(([key]) => !state.hiddenSeries.has(key))
-    .map(([key, series]) => {
-      const active = key === state.activeTrendMetric;
-      return `<polyline points="${points(series.values)}" fill="none" stroke="${series.color}" stroke-width="${active ? 4 : 2.5}" stroke-linecap="round" stroke-linejoin="round" opacity="${active ? 1 : 0.72}" />`;
-    })
-    .join("");
-
-  const labels = dashboardData.weeks
-    .map((week, index) => {
-      const x = pad + (index * (width - pad * 2)) / (dashboardData.weeks.length - 1);
-      return `<text x="${x - 20}" y="${height - 9}" font-size="10" fill="#646a73">${week}</text>`;
-    })
-    .join("");
-
-  return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Weekly trend chart">
-    <rect x="0" y="0" width="${width}" height="${height}" fill="#fff" />
-    ${grid}
-    ${labels}
-    ${lines}
-  </svg>`;
-}
-
-function renderMetricsTable() {
-  return `<div class="table-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>Measure name</th>
-          ${dashboardData.weeks.map((week) => `<th>${week}</th>`).join("")}
-        </tr>
-      </thead>
-      <tbody>
-        ${dashboardData.weeklyMetrics
-          .map(([name, key, values]) => `<tr class="${state.highlightMetric === key || state.activeTrendMetric === key ? "active" : ""}" data-table-metric="${key}" title="${metricTooltip(key, name)}">
-            <td>${name}</td>
-            ${values.map((value) => `<td>${value}</td>`).join("")}
-          </tr>`)
-          .join("")}
-      </tbody>
-    </table>
-  </div>`;
 }
 
 function bindEvents() {
@@ -567,29 +389,6 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const metric = button.dataset.metric;
       state.highlightMetric = state.highlightMetric === metric ? null : metric;
-      state.activeTrendMetric = trendSeries[metric] ? metric : state.activeTrendMetric;
-      render();
-    });
-  });
-
-  document.querySelectorAll("[data-series]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const key = button.dataset.series;
-      if (state.hiddenSeries.has(key)) {
-        state.hiddenSeries.delete(key);
-        state.activeTrendMetric = key;
-      } else {
-        state.hiddenSeries.add(key);
-      }
-      render();
-    });
-  });
-
-  document.querySelectorAll("[data-table-metric]").forEach((row) => {
-    row.addEventListener("click", () => {
-      const key = row.dataset.tableMetric;
-      state.activeTrendMetric = trendSeries[key] ? key : state.activeTrendMetric;
-      state.highlightMetric = key;
       render();
     });
   });

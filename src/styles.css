@@ -476,6 +476,10 @@ button {
   gap: 12px;
 }
 
+.sub-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .sub-card {
   min-height: 250px;
   padding: 12px;

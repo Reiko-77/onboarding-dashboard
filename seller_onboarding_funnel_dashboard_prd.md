@@ -144,7 +144,7 @@
 | Registered Seller | `registered_seller_t14` | `xx` |
 | Submit Sellers T14 | `submit_sellers_t14` | `xx` |
 | One Time Pass Seller T14 | `one_time_pass_seller_t14` | `xx` |
-| Onboarded Seller Volume | `onboarded_seller_volume` | `xx` |
+| # Onboarded Seller(w/ UBO passed) T14 | `onboarded_seller_w_ubo_passed_t14` | `xx` |
 | Registration → Onboarding | `registration_to_onboarding_rate_t14` | `xx%` |
 | Submit → Onboarding | `submit_to_onboarding_rate_t14` | `xx%` |
 
@@ -185,7 +185,7 @@
 | Register | 注册 Register | `# Registered Seller` |
 | Submit | 提资 Submit | `# Submit sellers T14` |
 | Moderate | 审核 Moderate | `# one time pass seller T14` |
-| Onboard | 入驻 Onboard | `Onboarded Seller Volume` |
+| Onboard | 入驻 Onboard | `# Onboarded Seller(w/ UBO passed) T14` |
 
 ### 8.3 阶段卡片内容
 
@@ -330,7 +330,7 @@ Submit 子模块建议做成“页面进度条”：
 
 | 指标 | 字段 | 展示 |
 |---|---|---|
-| 入驻卖家量 | `onboarded_seller_volume` | `xx` |
+| 入驻卖家量 | `onboarded_seller_w_ubo_passed_t14` | `xx` |
 | 注册 → 入驻转化率 | `registration_to_onboarding_rate_t14` | `xx%` |
 | 提资 → 入驻转化率 | `submit_to_onboarding_rate_t14` | `xx%` |
 
@@ -439,7 +439,7 @@ Submit 子模块建议做成“页面进度条”：
 | # sellers w/ kyc/kyb passed T14 | `kyc_kyb_passed_seller_t14` |
 | # sellers w/ human mod passed T14 | `human_mod_passed_seller_t14` |
 | # seller w/ pipo passed T14 | `pipo_passed_seller_t14` |
-| Onboarded Seller Volume | `onboarded_seller_volume` |
+| # Onboarded Seller(w/ UBO passed) T14 | `onboarded_seller_w_ubo_passed_t14` |
 | % Registration->Onboarding -T14 | `registration_to_onboarding_rate_t14` |
 | % submit->onboarding - T14 | `submit_to_onboarding_rate_t14` |
 
@@ -546,7 +546,7 @@ const mockDashboardData = {
     registered_seller_t14: "xx",
     submit_sellers_t14: "xx",
     one_time_pass_seller_t14: "xx",
-    onboarded_seller_volume: "xx",
+    onboarded_seller_w_ubo_passed_t14: "xx",
     registration_to_onboarding_rate_t14: "xx%",
     submit_to_onboarding_rate_t14: "xx%"
   },
@@ -588,8 +588,8 @@ const mockDashboardData = {
       key: "onboard",
       title: "Onboard",
       title_cn: "入驻",
-      main_metric_name: "Onboarded Seller Volume",
-      main_metric_key: "onboarded_seller_volume",
+      main_metric_name: "# Onboarded Seller(w/ UBO passed) T14",
+      main_metric_key: "onboarded_seller_w_ubo_passed_t14",
       value: "xx",
       share_of_registered: "xx%",
       tag: "Success"
@@ -713,8 +713,8 @@ const mockDashboardData = {
       }
     },
     {
-      measure_name: "Onboarded Seller Volume",
-      metric_key: "onboarded_seller_volume",
+      measure_name: "# Onboarded Seller(w/ UBO passed) T14",
+      metric_key: "onboarded_seller_w_ubo_passed_t14",
       values: {
         "2026-W24": "xx",
         "2026-W23": "xx",
@@ -740,7 +740,7 @@ const mockDashboardData = {
 | `kyc_kyb_passed_seller_t14` | T14 KYC/KYB 通过卖家数 |
 | `human_mod_passed_seller_t14` | T14 人工审核通过卖家数 |
 | `pipo_passed_seller_t14` | T14 PIPO 通过卖家数 |
-| `onboarded_seller_volume` | 入驻卖家量 |
+| `onboarded_seller_w_ubo_passed_t14` | 入驻卖家量 |
 | `business_details_completed` | Business Details 页面完成数 |
 | `primary_representative_completed` | Primary Representative 页面完成数 |
 | `shop_information_completed` | Shop Information 页面完成数 |
