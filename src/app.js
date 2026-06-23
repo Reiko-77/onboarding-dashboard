@@ -82,7 +82,7 @@ const dashboardData = {
   arrows: [
     { route: "Register → Submit", metricKey: "submission_rate_t14", value: "xx%" },
     { route: "Submit → Moderate", metricKey: "one_time_pass_rate_t14", value: "xx%" },
-    { route: "Moderate → Onboard", metricKey: null, value: "Not shown" },
+    { route: "Moderate → Onboard", metricKey: null, value: "" },
   ],
   conversions: [
     {
@@ -268,7 +268,7 @@ function renderMainFunnel() {
       items.push(`<div class="funnel-arrow" aria-label="${arrow.route}">
         <div>
           <div class="arrow-line"></div>
-          <div class="arrow-rate">${arrow.value}</div>
+          ${arrow.value ? `<div class="arrow-rate">${arrow.value}</div>` : ""}
         </div>
       </div>`);
     }
