@@ -69,6 +69,20 @@ const detailRows = [
 
 const trendWeeks = detailWeeks.slice().reverse();
 const trendPalette = ["#516f9c", "#2da44e", "#dc7c26", "#7c5cc4", "#c2410c", "#0f766e", "#b45309", "#475569"];
+const l2RejectionWeeks = [
+  "2025-W52",
+  "2026-W01",
+  "2026-W04",
+  "2026-W07",
+  "2026-W10",
+  "2026-W14",
+  "2026-W17",
+  "2026-W21",
+  "2026-W24",
+  "2026-W26",
+  "2026-W27",
+];
+const l2Palette = ["#2f6f9f", "#f2cf45", "#4b8364", "#f3b37e", "#c65353", "#6fc4bd", "#6657b8", "#d982a0", "#8b0f7e", "#b89a8c"];
 
 const dashboardData = {
   funnel: [
@@ -212,6 +226,18 @@ const dashboardData = {
     { label: "Human mod passed rate", metricKey: "human_mod_passed_rate_t14", unit: "rate", values: [54, 55, 56, 55, 57, 58, 59, 60, 61, 62] },
     { label: "PIPO passed rate", metricKey: "pipo_passed_rate_t14", unit: "rate", values: [46, 47, 47, 48, 49, 50, 51, 51, 52, 53] },
   ],
+  l2Rejections: [
+    { label: "Street name mismatch", values: [80, 600, 5200, 900, 760, 1050, 1280, 1900, 3100, 3300, 160] },
+    { label: "ID is not an acceptable type of ID document", values: [60, 320, 950, 820, 430, 360, 390, 460, 550, 640, 80] },
+    { label: "Business name mismatch", values: [50, 220, 1050, 780, 360, 430, 500, 620, 760, 740, 60] },
+    { label: "Document is not an acceptable proof of business", values: [35, 180, 700, 590, 310, 280, 360, 450, 560, 520, 40] },
+    { label: "Last name mismatch", values: [30, 140, 410, 330, 220, 180, 210, 260, 310, 320, 35] },
+    { label: "First name mismatch", values: [24, 110, 320, 280, 160, 130, 150, 190, 220, 240, 28] },
+    { label: "Wrong proof of address document", values: [20, 90, 260, 250, 140, 110, 120, 150, 170, 180, 22] },
+    { label: "Date of Birth mismatch", values: [16, 70, 190, 160, 100, 80, 90, 110, 130, 140, 18] },
+    { label: "City name mismatch", values: [12, 50, 140, 120, 80, 60, 70, 90, 100, 110, 14] },
+    { label: "ID expiration date is in the past", values: [10, 35, 100, 90, 60, 45, 50, 65, 80, 90, 10] },
+  ],
 };
 
 const state = {
@@ -337,7 +363,6 @@ function renderKeyMetricsTrend() {
 function renderMainFunnel() {
   const items = [];
   dashboardData.funnel.forEach((stage, index) => {
-    const subSteps = stage.key === "submit" ? `${shouldShowBusinessDetails() ? 4 : 3} sub steps` : stage.key === "moderate" ? "4 review checks" : "";
     const isBridgeHighlighted = highlightedStages().includes(stage.key);
     items.push(`<button class="funnel-stage ${state.selectedStage === stage.key ? "active" : ""} ${isBridgeHighlighted ? "highlighted" : ""}" data-stage="${stage.key}" type="button">
       <div class="stage-index">${index + 1}</div>
@@ -346,7 +371,6 @@ function renderMainFunnel() {
       <div class="stage-value">${stage.value}</div>
       <div class="stage-wow">${stage.wow}</div>
       <div class="stage-sub"><span>Share:<br>${stage.share}</span><span class="tag">${stage.tag}</span></div>
-      ${subSteps ? `<div class="stage-sub"><span>${subSteps}</span><span>Mock Data</span></div>` : ""}
     </button>`);
 
     if (index < dashboardData.arrows.length) {
@@ -442,8 +466,8 @@ function renderModerationDrilldown() {
     ${renderDrilldownTable(["Metric", "Value"], dashboardData.moderationSummary.map(([name, , value]) => [name, value]))}
     <h4>Moderation Result Details</h4>
     ${renderDrilldownTable(["Result Field", "Value"], dashboardData.moderationNewFields)}
-    <h4>Moderation Trend</h4>
-    ${renderLineChart(dashboardData.moderationTrend, "moderation-chart")}
+    <h4>L2 Rejection Tracker - Seller Onboarding</h4>
+    ${renderL2RejectionTracker()}
   </article>`;
 }
 
@@ -471,6 +495,7 @@ function renderLineChart(series, chartId) {
   const allValues = series.flatMap((item) => item.values);
   const minValue = Math.min(...allValues) - 4;
   const maxValue = Math.max(...allValues) + 4;
+  const focusedMetric = series.some((item) => item.metricKey === state.highlightMetric) ? state.highlightMetric : null;
   const scaleX = (index) => padding.left + (index * plotWidth) / (trendWeeks.length - 1);
   const scaleY = (value) => padding.top + ((maxValue - value) * plotHeight) / (maxValue - minValue);
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => Math.round(maxValue - (maxValue - minValue) * ratio));
@@ -480,7 +505,7 @@ function renderLineChart(series, chartId) {
     <div class="trend-legend">
       ${series
         .map((item, index) => `<button class="${state.highlightMetric === item.metricKey ? "active" : ""}" type="button" data-table-metric="${item.metricKey}">
-          <span class="legend-dot" style="background:${trendPalette[index % trendPalette.length]}"></span>${escapeHtml(item.label)}
+          <span class="legend-dot" style="background:${focusedMetric && focusedMetric !== item.metricKey ? "#cbd5e1" : trendPalette[index % trendPalette.length]}"></span>${escapeHtml(item.label)}
         </button>`)
         .join("")}
     </div>
@@ -499,9 +524,10 @@ function renderLineChart(series, chartId) {
         .join("")}
       ${series
         .map((item, index) => {
-          const color = trendPalette[index % trendPalette.length];
+          const isMuted = focusedMetric && focusedMetric !== item.metricKey;
+          const color = isMuted ? "#cbd5e1" : trendPalette[index % trendPalette.length];
           const points = item.values.map((value, pointIndex) => `${scaleX(pointIndex)},${scaleY(value)}`).join(" ");
-          return `<g class="series ${state.highlightMetric === item.metricKey ? "active" : ""}">
+          return `<g class="series ${state.highlightMetric === item.metricKey ? "active" : ""} ${isMuted ? "muted" : ""}">
             <polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
             ${item.values
               .map((value, pointIndex) => `<circle cx="${scaleX(pointIndex)}" cy="${scaleY(value)}" r="3.5" fill="${color}"><title>${escapeHtml(item.label)}: ${item.unit === "rate" ? "xx%" : "xx"}</title></circle>`)
@@ -509,6 +535,67 @@ function renderLineChart(series, chartId) {
           </g>`;
         })
         .join("")}
+    </svg>
+  </div>`;
+}
+
+function renderL2RejectionTracker() {
+  const width = 1180;
+  const height = 390;
+  const padding = { top: 18, right: 350, bottom: 40, left: 42 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const totals = l2RejectionWeeks.map((_, weekIndex) => dashboardData.l2Rejections.reduce((sum, item) => sum + item.values[weekIndex], 0));
+  const maxValue = 7000;
+  const scaleX = (index) => padding.left + (index * plotWidth) / (l2RejectionWeeks.length - 1);
+  const scaleY = (value) => padding.top + ((maxValue - value) * plotHeight) / maxValue;
+  const yTicks = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000];
+  const cumulative = new Array(l2RejectionWeeks.length).fill(0);
+
+  const areas = dashboardData.l2Rejections
+    .map((item, index) => {
+      const lower = cumulative.slice();
+      item.values.forEach((value, valueIndex) => {
+        cumulative[valueIndex] += value;
+      });
+      const upperPoints = cumulative.map((value, pointIndex) => `${scaleX(pointIndex)},${scaleY(value)}`).join(" ");
+      const lowerPoints = lower
+        .map((value, pointIndex) => `${scaleX(pointIndex)},${scaleY(value)}`)
+        .reverse()
+        .join(" ");
+      const linePoints = cumulative.map((value, pointIndex) => `${scaleX(pointIndex)},${scaleY(value)}`).join(" ");
+      const color = l2Palette[index % l2Palette.length];
+      return `<g class="stacked-series">
+        <polygon points="${upperPoints} ${lowerPoints}" fill="${color}" opacity="0.34"></polygon>
+        <polyline points="${linePoints}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"></polyline>
+        ${cumulative.map((value, pointIndex) => `<circle cx="${scaleX(pointIndex)}" cy="${scaleY(value)}" r="2.6" fill="${color}"></circle>`).join("")}
+      </g>`;
+    })
+    .reverse()
+    .join("");
+
+  return `<div class="l2-tracker">
+    <svg class="stacked-area-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="L2 Rejection Tracker - Seller Onboarding">
+      ${yTicks
+        .map((tick) => {
+          const y = scaleY(tick);
+          return `<g class="chart-grid"><line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"></line><text x="8" y="${y + 4}">${tick === 0 ? "0" : `${tick / 1000}K`}</text></g>`;
+        })
+        .join("")}
+      ${areas}
+      ${l2RejectionWeeks
+        .map((week, index) => `<text class="chart-x-label" x="${scaleX(index)}" y="${height - 14}">${week}</text>`)
+        .join("")}
+      <polyline points="${totals.map((value, index) => `${scaleX(index)},${scaleY(value)}`).join(" ")}" fill="none" stroke="#2f6f9f" stroke-width="3"></polyline>
+      <g class="l2-legend">
+        ${dashboardData.l2Rejections
+          .map((item, index) => {
+            const y = 28 + index * 24;
+            const color = l2Palette[index % l2Palette.length];
+            return `<g><circle cx="${width - padding.right + 24}" cy="${y}" r="5" fill="${color}"></circle><text x="${width - padding.right + 38}" y="${y + 4}">${escapeHtml(item.label)}</text></g>`;
+          })
+          .join("")}
+      </g>
     </svg>
   </div>`;
 }

@@ -31,3 +31,9 @@
 - `Submit Drill-down Analysis / 提资下钻分析` 改为表格形式，删除原格子中的灰色说明小字。
 - `Moderation Drill-down Analysis / 审核下钻分析` 改为表格形式，并新增审核通过率趋势折线图。
 - 保留 `v0`、`v1`、`v2`、`v3` 标签不变，v4 将作为新提交和新标签推送。
+
+## v5 变更记录
+- `Key Metrics Trend` 图例按钮被点击后，选中指标保持原色，其他折线和点位变为灰色以便辨认。
+- 删除主漏斗 Submit / Moderate 卡片底部的灰色说明小字。
+- 将审核下钻中的 `Moderation Trend` 替换为 `L2 Rejection Tracker - Seller Onboarding` 堆叠面积图。
+- 将入口资源版本参数更新为 `v5`，降低线上缓存加载旧资源的概率。

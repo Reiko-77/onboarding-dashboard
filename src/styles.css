@@ -783,12 +783,42 @@ button {
   opacity: 0.82;
 }
 
+.series.muted {
+  opacity: 0.38;
+}
+
 .series.active {
   opacity: 1;
 }
 
 .series.active polyline {
   stroke-width: 4;
+}
+
+.l2-tracker {
+  overflow: auto;
+  border: 1px solid #dce4ef;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.stacked-area-chart {
+  width: 100%;
+  min-width: 1120px;
+  height: 390px;
+  background:
+    linear-gradient(180deg, #ffffff, #fbfdff);
+}
+
+.stacked-series polyline,
+.stacked-series circle {
+  filter: drop-shadow(0 1px 1px rgba(31, 35, 41, 0.12));
+}
+
+.l2-legend text {
+  fill: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .drilldown-table-scroll {
