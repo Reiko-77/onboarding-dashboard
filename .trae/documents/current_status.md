@@ -24,3 +24,10 @@
 - 主漏斗标题改为 `Seller Onboarding Funnel`，主指标、转化率卡片均增加 `WoW xx%` 展示。
 - 新增 `Submit Drill-down Analysis / 提资下钻分析` 和 `Moderation Drill-down Analysis / 审核下钻分析`。
 - 点击主漏斗 Submit / Moderate 阶段可跳转到对应下钻分析模块，并短暂高亮目标模块。
+
+## v4 变更记录
+- `Conversion Bridge` 卡片只展示 metric 标识和 WoW，不再展示 numerator / denominator。
+- 在 `Detailed Metrics` 和 `Seller Onboarding Funnel` 之间新增 `Key Metrics Trend`，展示漏斗 4 个数量指标和 4 个百分比指标趋势。
+- `Submit Drill-down Analysis / 提资下钻分析` 改为表格形式，删除原格子中的灰色说明小字。
+- `Moderation Drill-down Analysis / 审核下钻分析` 改为表格形式，并新增审核通过率趋势折线图。
+- 保留 `v0`、`v1`、`v2`、`v3` 标签不变，v4 将作为新提交和新标签推送。

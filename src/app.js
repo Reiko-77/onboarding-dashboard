@@ -67,6 +67,9 @@ const detailRows = [
   ["# one time pass seller T14", "one_time_pass_seller_t14", "xx"],
 ];
 
+const trendWeeks = detailWeeks.slice().reverse();
+const trendPalette = ["#516f9c", "#2da44e", "#dc7c26", "#7c5cc4", "#c2410c", "#0f766e", "#b45309", "#475569"];
+
 const dashboardData = {
   funnel: [
     {
@@ -194,6 +197,21 @@ const dashboardData = {
     ["LLM studio moderation results", "xx"],
     ["human moderation results", "xx"],
   ],
+  keyMetricTrends: [
+    { label: "# Registered Seller", metricKey: "registered_seller_t14", unit: "count", values: [60, 64, 61, 68, 72, 76, 78, 82, 86, 90] },
+    { label: "# Submit sellers T14", metricKey: "submit_sellers_t14", unit: "count", values: [34, 36, 35, 39, 42, 45, 47, 50, 52, 55] },
+    { label: "# one time pass seller T14", metricKey: "one_time_pass_seller_t14", unit: "count", values: [21, 22, 23, 24, 27, 29, 30, 32, 34, 36] },
+    { label: "# Onboarded Seller(w/ UBO passed) T14", metricKey: "onboarded_seller_w_ubo_passed_t14", unit: "count", values: [15, 16, 17, 19, 20, 22, 23, 24, 26, 28] },
+    { label: "submission rate T14", metricKey: "submission_rate_t14", unit: "rate", values: [42, 43, 45, 46, 47, 48, 49, 50, 51, 52] },
+    { label: "one time pass rate T14", metricKey: "one_time_pass_rate_t14", unit: "rate", values: [28, 29, 30, 31, 33, 34, 35, 36, 37, 38] },
+    { label: "Onboarding Rate -T14", metricKey: "onboarding_rate_t14_denom_registered", unit: "rate", values: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29] },
+    { label: "% submit->onboarding - T14", metricKey: "submit_to_onboarding_rate_t14", unit: "rate", values: [24, 25, 26, 27, 29, 30, 31, 32, 33, 34] },
+  ],
+  moderationTrend: [
+    { label: "KYC/KYB passed rate", metricKey: "kyc_kyb_passed_rate_t14", unit: "rate", values: [62, 61, 63, 64, 65, 67, 66, 68, 69, 70] },
+    { label: "Human mod passed rate", metricKey: "human_mod_passed_rate_t14", unit: "rate", values: [54, 55, 56, 55, 57, 58, 59, 60, 61, 62] },
+    { label: "PIPO passed rate", metricKey: "pipo_passed_rate_t14", unit: "rate", values: [46, 47, 47, 48, 49, 50, 51, 51, 52, 53] },
+  ],
 };
 
 const state = {
@@ -225,6 +243,7 @@ function render() {
       ${renderTitle()}
       ${renderFilters()}
       ${renderDetailedMetrics()}
+      ${renderKeyMetricsTrend()}
       ${renderMainFunnel()}
       ${renderConversionBridge()}
       ${renderDrilldowns()}
@@ -302,6 +321,19 @@ function renderDetailedMetrics() {
   </section>`;
 }
 
+function renderKeyMetricsTrend() {
+  return `<section class="module card">
+    <div class="module-head">
+      <h2 class="section-title">Key Metrics Trend</h2>
+      <div class="module-meta">
+        <span class="meta-pill">Funnel 4 counts + 4 rates</span>
+        <span class="meta-pill">Mock Data</span>
+      </div>
+    </div>
+    ${renderLineChart(dashboardData.keyMetricTrends, "key-metrics-chart")}
+  </section>`;
+}
+
 function renderMainFunnel() {
   const items = [];
   dashboardData.funnel.forEach((stage, index) => {
@@ -350,16 +382,15 @@ function renderConversionBridge() {
   return `<section class="module card">
     <div class="module-head">
       <h2 class="section-title">Conversion Bridge</h2>
-      <div class="module-meta"><span class="meta-pill">Formula + WoW</span></div>
+      <div class="module-meta"><span class="meta-pill">Metric + WoW</span></div>
     </div>
     <div class="bridge-grid">
       ${dashboardData.conversions
-        .map((item) => `<button class="bridge-card ${state.highlightMetric === item.metricKey ? "active" : ""}" type="button" data-metric="${item.metricKey}" title="metric: ${item.metricName}\nnumerator: ${item.numerator}\ndenominator: ${item.denominator}\nWoW: ${item.wow}">
+        .map((item) => `<button class="bridge-card ${state.highlightMetric === item.metricKey ? "active" : ""}" type="button" data-metric="${item.metricKey}" title="metric: ${item.metricName}\nWoW: ${item.wow}">
           <div class="bridge-route">${item.route}</div>
           <div class="bridge-value">${item.value}</div>
           <div class="bridge-wow">${item.wow}</div>
-          <div class="bridge-formula">N: ${item.numerator}</div>
-          <div class="bridge-formula">D: ${item.denominator}</div>
+          <div class="bridge-formula">Metric: ${item.metricKey}</div>
         </button>`)
         .join("")}
     </div>
@@ -390,22 +421,11 @@ function renderSubmitDrilldown() {
       </div>
     </div>
     <h4>Resubmit & Pre-KYC Summary</h4>
-    <div class="metric-card-grid">
-      ${dashboardData.submitSummary.map(([name, value, note]) => renderMetricCard(name, value, note)).join("")}
-    </div>
+    ${renderDrilldownTable(["Metric", "Value"], dashboardData.submitSummary.map(([name, value]) => [name, value]))}
     <h4>New Data Fields</h4>
-    <div class="metric-card-grid">
-      ${dashboardData.submitNewFields.map(([name, value, note]) => renderMetricCard(name, value, note)).join("")}
-    </div>
+    ${renderDrilldownTable(["Metric", "Value"], dashboardData.submitNewFields.map(([name, value]) => [name, value]))}
     <h4>Submit Sub-step Tracking</h4>
-    <div class="stepper drilldown-steps">
-      ${submitSteps
-        .map(([key, name, field, event, value, note], index) => `<div class="step" data-step="${index + 1}">
-          <div class="step-name">${name}</div>
-          <div class="step-meta">count: ${value}<br>field: ${field}<br>event: ${event}${note ? ` · ${note}` : ""}</div>
-        </div>`)
-        .join("")}
-    </div>
+    ${renderDrilldownTable(["Step", "Count"], submitSteps.map(([, name, , , value]) => [name, value]))}
   </article>`;
 }
 
@@ -419,21 +439,77 @@ function renderModerationDrilldown() {
       </div>
     </div>
     <h4>Review Pass Summary</h4>
-    <div class="metric-card-grid three">
-      ${dashboardData.moderationSummary.map(([name, note, value]) => renderMetricCard(name, value, note)).join("")}
-    </div>
+    ${renderDrilldownTable(["Metric", "Value"], dashboardData.moderationSummary.map(([name, , value]) => [name, value]))}
     <h4>Moderation Result Details</h4>
-    <div class="metric-card-grid">
-      ${dashboardData.moderationNewFields.map(([name, value]) => renderMetricCard(name, value, "Result placeholder")).join("")}
-    </div>
+    ${renderDrilldownTable(["Result Field", "Value"], dashboardData.moderationNewFields)}
+    <h4>Moderation Trend</h4>
+    ${renderLineChart(dashboardData.moderationTrend, "moderation-chart")}
   </article>`;
 }
 
-function renderMetricCard(name, value, note) {
-  return `<div class="metric-card" data-metric-card="${escapeHtml(name)}">
-    <div class="metric-card-name">${name}</div>
-    <div class="metric-card-value">${value}</div>
-    <div class="metric-card-note">${note || "Mock data"}</div>
+function renderDrilldownTable(headers, rows) {
+  return `<div class="drilldown-table-scroll">
+    <table class="drilldown-table">
+      <thead>
+        <tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr>
+      </thead>
+      <tbody>
+        ${rows
+          .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`)
+          .join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderLineChart(series, chartId) {
+  const width = 980;
+  const height = 260;
+  const padding = { top: 18, right: 28, bottom: 42, left: 44 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const allValues = series.flatMap((item) => item.values);
+  const minValue = Math.min(...allValues) - 4;
+  const maxValue = Math.max(...allValues) + 4;
+  const scaleX = (index) => padding.left + (index * plotWidth) / (trendWeeks.length - 1);
+  const scaleY = (value) => padding.top + ((maxValue - value) * plotHeight) / (maxValue - minValue);
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => Math.round(maxValue - (maxValue - minValue) * ratio));
+  const shortWeek = (week) => week.match(/W\d+/)?.[0] || week;
+
+  return `<div class="trend-chart" id="${chartId}">
+    <div class="trend-legend">
+      ${series
+        .map((item, index) => `<button class="${state.highlightMetric === item.metricKey ? "active" : ""}" type="button" data-table-metric="${item.metricKey}">
+          <span class="legend-dot" style="background:${trendPalette[index % trendPalette.length]}"></span>${escapeHtml(item.label)}
+        </button>`)
+        .join("")}
+    </div>
+    <svg class="line-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${chartId}">
+      ${yTicks
+        .map((tick) => {
+          const y = scaleY(tick);
+          return `<g class="chart-grid"><line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"></line><text x="8" y="${y + 4}">${tick}</text></g>`;
+        })
+        .join("")}
+      ${trendWeeks
+        .map((week, index) => {
+          const x = scaleX(index);
+          return `<text class="chart-x-label" x="${x}" y="${height - 14}">${shortWeek(week)}</text>`;
+        })
+        .join("")}
+      ${series
+        .map((item, index) => {
+          const color = trendPalette[index % trendPalette.length];
+          const points = item.values.map((value, pointIndex) => `${scaleX(pointIndex)},${scaleY(value)}`).join(" ");
+          return `<g class="series ${state.highlightMetric === item.metricKey ? "active" : ""}">
+            <polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            ${item.values
+              .map((value, pointIndex) => `<circle cx="${scaleX(pointIndex)}" cy="${scaleY(value)}" r="3.5" fill="${color}"><title>${escapeHtml(item.label)}: ${item.unit === "rate" ? "xx%" : "xx"}</title></circle>`)
+              .join("")}
+          </g>`;
+        })
+        .join("")}
+    </svg>
   </div>`;
 }
 

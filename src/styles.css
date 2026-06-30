@@ -496,8 +496,15 @@ button {
 }
 
 .bridge-formula {
-  color: var(--muted);
+  display: inline-flex;
+  margin-top: 10px;
+  padding: 4px 8px;
+  border: 1px solid #d5dfec;
+  border-radius: 999px;
+  background: var(--soft-blue);
+  color: #31445f;
   font-size: 11px;
+  font-weight: 800;
   line-height: 1.4;
 }
 
@@ -716,6 +723,119 @@ button {
 
 .drilldown-panel.flash {
   animation: targetFlash 1.4s ease-in-out;
+}
+
+.trend-chart {
+  display: grid;
+  gap: 10px;
+}
+
+.trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trend-legend button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d5dfec;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.trend-legend button.active {
+  border-color: var(--warning);
+  background: #fff8e6;
+  color: #7a5410;
+}
+
+.line-chart {
+  width: 100%;
+  height: 288px;
+  border: 1px solid #dce4ef;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, #ffffff, #fbfdff);
+}
+
+.chart-grid line {
+  stroke: #e8edf5;
+  stroke-width: 1;
+}
+
+.chart-grid text,
+.chart-x-label {
+  fill: #7b8492;
+  font-size: 11px;
+}
+
+.chart-x-label {
+  text-anchor: middle;
+}
+
+.series {
+  opacity: 0.82;
+}
+
+.series.active {
+  opacity: 1;
+}
+
+.series.active polyline {
+  stroke-width: 4;
+}
+
+.drilldown-table-scroll {
+  overflow: auto;
+  border: 1px solid #dce4ef;
+  border-radius: 6px;
+}
+
+.drilldown-table {
+  min-width: 0;
+  font-size: 12px;
+}
+
+.drilldown-table thead th {
+  position: static;
+  z-index: auto;
+  text-align: left;
+}
+
+.drilldown-table thead th:last-child,
+.drilldown-table tbody td:last-child {
+  width: 160px;
+  text-align: right;
+}
+
+.drilldown-table tbody td,
+.drilldown-table tbody td:first-child {
+  position: static;
+  z-index: auto;
+  background: #ffffff;
+  color: #263850;
+  font-weight: 700;
+  text-align: left;
+}
+
+.drilldown-table tbody td:last-child {
+  color: #172033;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.drilldown-table tbody tr:hover td,
+.drilldown-table tbody tr.active td,
+.drilldown-table tbody tr:hover td:first-child,
+.drilldown-table tbody tr.active td:first-child {
+  background: #fff8e6;
+  color: #263850;
 }
 
 .metric-card-grid {
